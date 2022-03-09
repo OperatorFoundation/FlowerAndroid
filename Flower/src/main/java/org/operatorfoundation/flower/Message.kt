@@ -188,13 +188,25 @@ open class Message(data: ByteArray)
             }
         }
     }
+
+    var data: ByteArray = ByteArray(1)
+        get() {
+            when (this.messageType)
+            {
+                MessageType.TCPOpenV4Type ->
+                {
+                    val tcpOpenV4 = this.content as TCPOpenV4
+                    //val result =
+                }
+            }
+        }
 }
 
 open class Content {}
 
 class TCPOpenV4(val endpointV4: EndpointV4, val streamIdentifier: StreamIdentifier): Content()
 {
-    // TODO
+
 }
 
 class TCPOpenV6(val endpointV6: EndpointV6, val streamIdentifier: StreamIdentifier): Content()
