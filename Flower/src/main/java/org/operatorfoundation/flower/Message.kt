@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 
 typealias StreamIdentifier = Long
 
-open class Message(data: ByteArray)
+open class Message(val data: ByteArray)
 {
     val messageType: MessageType
     val content: Content

@@ -45,4 +45,32 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
             readQueue.add(message)
         }
     }
+
+    fun writeMessage(message: Message)
+    {
+        writeQueue.add(message)
+    }
+
+    fun writeMessages()
+    {
+        while (true)
+        {
+            if (writeQueue.isNotEmpty())
+            {
+                val message = writeQueue.remove()
+                val messageData = message.data
+
+                val messageSent = connection.writeWithLengthPrefix(messageData, 16)
+
+                if (messageSent == false)
+                {
+                    logger?.log(Level.SEVERE, "Flower failed to write a message.")
+                    return
+                }
+            }
+        }
+    }
+
+
+
 }
