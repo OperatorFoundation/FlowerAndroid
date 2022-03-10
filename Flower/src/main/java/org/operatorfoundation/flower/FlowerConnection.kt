@@ -1,11 +1,15 @@
 package org.operatorfoundation.flower
 
 import org.operatorfoundation.transmission.TransmissionConnection
+import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
 class FlowerConnection(var connection: TransmissionConnection, val logger: Logger?)
 {
+    var readQueue:Queue<Message> = LinkedList()
+    var writeQueue: Queue<Message> = LinkedList()
+
     init
     {
 
@@ -13,7 +17,14 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
     fun readMessage(): Message?
     {
-        return null
+        if (readQueue.isEmpty())
+        {
+            return null
+        }
+        else
+        {
+            return readQueue.remove()
+        }
     }
 
     fun readMessages()
@@ -30,8 +41,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
             logger?.log(Level.FINE, "Flower read data: ${maybeData.decodeToString()}" )
 
-            val maybeMessage = Message(maybeData!!)
-
+            val message = Message(maybeData!!)
+            readQueue.add(message)
         }
     }
 }

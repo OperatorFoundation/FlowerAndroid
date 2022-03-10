@@ -2,8 +2,6 @@ package org.operatorfoundation.flower
 
 import java.net.Inet4Address
 import java.net.Inet6Address
-import java.net.InetAddress
-import java.net.SocketAddress
 import java.nio.ByteBuffer
 
 typealias StreamIdentifier = Long
@@ -189,115 +187,216 @@ open class Message(data: ByteArray)
         }
     }
 
-    var data: ByteArray = ByteArray(1)
-        get() {
-            when (this.messageType)
+    val description: String
+    get()
+    {
+        when(messageType)
+        {
+            MessageType.TCPOpenV4Type ->
             {
-                MessageType.TCPOpenV4Type ->
-                {
-                    val tcpOpenV4 = this.content as TCPOpenV4
-                    //val result =
-                }
+                val tcpOpenV4 = this.content as TCPOpenV4
+                return """
+                IPAssignV4
+                IP: ${tcpOpenV4.endpointV4.host.hostAddress}:${tcpOpenV4.endpointV4.port}
+                """
+            }
+            MessageType.TCPOpenV6Type ->
+            {
+                val tcpOpenV6 = this.content as TCPOpenV6
+                return """
+                IPAssignV4
+                IP: ${tcpOpenV6.endpointV6.host.hostAddress}:${tcpOpenV6.endpointV6.port}
+                """
+            }
+            MessageType.TCPCloseType ->
+            {
+                val message = this.content as TCPClose
+                return """
+                TCPClose
+                StreamIdentifier: ${message.streamIdentifier}
+                """
+            }
+            MessageType.TCPDataType ->
+            {
+                val message = this.content as TCPData
+                return """
+                TCPData
+                streamIdentifier: ${message.streamIdentifier}
+                data: ${message.payload}
+                """
+            }
+            MessageType.UDPDataV4Type ->
+            {
+                val message = this.content as UDPDataV4
+                return """
+                UDPDataV4
+                endpointV4: ${message.endpointV4.host.hostAddress}:${message.endpointV4.port}
+                data: ${message.payload}
+                """
+            }
+            MessageType.UDPDataV6Type ->
+            {
+                val message = this.content as UDPDataV6
+                return """
+                UDPDataV6
+                endpointV6: ${message.endpointV6.host.hostAddress}:${message.endpointV6.port}
+                data: ${message.payload}
+                """
+            }
+            MessageType.IPAssignV4Type ->
+            {
+                val message = this.content as IPAssignV4
+                return """
+                IPAssignV4
+                IP: ${message.inet4Address.hostAddress}
+                """
+            }
+            MessageType.IPAssignV6Type ->
+            {
+                val message = content as IPAssignV6
+                return """
+                IPAssignV6
+                ip: ${message.inet6Address.hostAddress}
+                """
+            }
+            MessageType.IPAssignDualStackType ->
+            {
+                val message = content as IPAssignDualStack
+                return """
+                IPAssignDualStack
+                IPv4: ${message.inet4Address.hostAddress}
+                IPv6: ${message.inet6Address.hostAddress}
+                """
+            }
+            MessageType.IPDataV4Type ->
+            {
+                val message = content as IPDataV4
+                return """
+                IPDataV4
+                data: ${message.bytes}
+                """
+            }
+            MessageType.IPDataV6Type ->
+            {
+                val message = content as IPDataV6
+                return """
+                IPDataV6
+                data: ${message.bytes}
+                """
+            }
+            MessageType.IPRequestV4Type ->
+            {
+                return """
+                IPRequestV4
+                """
+            }
+            MessageType.IPRequestV6Type ->
+            {
+                return """
+                IPRequestV6
+                """
+            }
+            MessageType.IPRequestDualStackType ->
+            {
+                return """
+                IPRequestDualStack
+                """
+            }
+            MessageType.IPReuseV4Type ->
+            {
+                val message = content as IPReuseV4
+                return """
+                IPReuseV4
+                IP: ${message.inet4Address.hostAddress}
+                """
+            }
+            MessageType.IPReuseV6Type ->
+            {
+                val message = content as IPReuseV6
+                return """
+                IPReuseV6
+                ip: ${message.inet6Address.hostAddress}
+                """
+            }
+            MessageType.IPReuseDualStackType ->
+            {
+                val message = content as IPReuseDualStackType
+                return """
+                IPReuseDualStack
+                IPv4: ${message.inet4Address.hostAddress}
+                IPv6: ${message.inet6Address.hostAddress}
+                """
+            }
+            MessageType.ICMPDataV4Type ->
+            {
+                val message = content as ICMPDataV4Type
+                return """
+                ICMPDataV4
+                IPv4: ${message.inet4Address.hostAddress}
+                Data: ${message.bytes}
+                """
+            }
+            MessageType.ICMPDataV6Type ->
+            {
+                val message = content as ICMPDataV6Type
+                return """
+                ICMPDataV6
+                IPv6: ${message.inet6Address.hostAddress}
+                Data: ${message.bytes}
+                """
             }
         }
+    }
+
+//    var data: ByteArray = ByteArray(1)
+//    get()
+//    {
+//        when (this.messageType)
+//        {
+//            MessageType.TCPOpenV4Type ->
+//            {
+//                val tcpOpenV4 = this.content as TCPOpenV4
+//                val messageTypeBytes = ByteArray(1)
+//                messageTypeBytes[0] = this.messageType.byte.toByte()
+//                val endpointBytes = tcpOpenV4.endpointV4.getBytes()
+//                val streamIDBytes = longToByteArray(tcpOpenV4.streamIdentifier)
+//
+//                return messageTypeBytes + endpointBytes + streamIDBytes
+//            }
+//            MessageType.TCPOpenV6Type ->
+//            {
+//                val tcpOpenV6 = this.content as TCPOpenV6
+//                val messageTypeBytes = ByteArray(1)
+//                messageTypeBytes[0] = this.messageType.byte.toByte()
+//                val endpointBytes = tcpOpenV6.endpointV6.getBytes()
+//                val streamIDBytes = longToByteArray(tcpOpenV6.streamIdentifier)
+//
+//                return messageTypeBytes + endpointBytes + streamIDBytes
+//            }
+//        }
+//    }
 }
 
 open class Content {}
-
 class TCPOpenV4(val endpointV4: EndpointV4, val streamIdentifier: StreamIdentifier): Content()
-{
-
-}
-
 class TCPOpenV6(val endpointV6: EndpointV6, val streamIdentifier: StreamIdentifier): Content()
-{
-    // TODO
-}
-
 class TCPClose(val streamIdentifier: StreamIdentifier): Content()
-{
-    // TODO
-}
-
 class TCPData(val streamIdentifier: StreamIdentifier, val payload: ByteArray): Content()
-{
-    // TODO
-}
-
 class UDPDataV4(val endpointV4: EndpointV4, val payload: ByteArray): Content()
-{
-    // TODO
-}
-
 class UDPDataV6(val endpointV6: EndpointV6, val payload: ByteArray): Content()
-{
-    // TODO
-}
-
 class IPAssignV4(val inet4Address: Inet4Address): Content()
-{
-    // TODO
-}
-
 class IPAssignV6(val inet6Address: Inet6Address): Content()
-{
-    // TODO
-}
-
-class IPAssignDualStack(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content()
-{
-    // TODO
-}
-
-class IPDataV4(bytes: ByteArray): Content()
-{
-    // TODO
-}
-
-class IPDataV6(bytes: ByteArray): Content()
-{
-    // TODO
-}
-
+class IPAssignDualStack(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content() {}
+class IPDataV4(val bytes: ByteArray): Content()
+class IPDataV6(val bytes: ByteArray): Content()
 class IPRequestV4: Content()
-{
-    // TODO
-}
-
 class IPRequestV6: Content()
-{
-    // TODO
-}
-
 class IPRequestDualStack: Content()
-{
-    // TODO
-}
-
-class IPReuseV4(inet4Address: Inet4Address): Content()
-{
-
-}
-
-class IPReuseV6(inet6Address: Inet6Address): Content()
-{
-
-}
-
-class IPReuseDualStackType(inet4Address: Inet4Address, inet6Address: Inet6Address): Content()
-{
-
-}
-
-class ICMPDataV4Type(inet4Address: Inet4Address, bytes: ByteArray): Content()
-{
-
-}
-
-class ICMPDataV6Type(inet6Address: Inet6Address, bytes: ByteArray): Content()
-{
-
-}
+class IPReuseV4(val inet4Address: Inet4Address): Content()
+class IPReuseV6(val inet6Address: Inet6Address): Content()
+class IPReuseDualStackType(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content()
+class ICMPDataV4Type(val inet4Address: Inet4Address, val bytes: ByteArray): Content()
+class ICMPDataV6Type(val inet6Address: Inet6Address, val bytes: ByteArray): Content()
 
 enum class MessageType(val byte: Int)
 {
