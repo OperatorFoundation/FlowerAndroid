@@ -348,55 +348,259 @@ open class Message(val data: ByteArray)
         }
     }
 
-//    var data: ByteArray = ByteArray(1)
-//    get()
-//    {
-//        when (this.messageType)
-//        {
-//            MessageType.TCPOpenV4Type ->
-//            {
-//                val tcpOpenV4 = this.content as TCPOpenV4
-//                val messageTypeBytes = ByteArray(1)
-//                messageTypeBytes[0] = this.messageType.byte.toByte()
-//                val endpointBytes = tcpOpenV4.endpointV4.getBytes()
-//                val streamIDBytes = longToByteArray(tcpOpenV4.streamIdentifier)
-//
-//                return messageTypeBytes + endpointBytes + streamIDBytes
-//            }
-//            MessageType.TCPOpenV6Type ->
-//            {
-//                val tcpOpenV6 = this.content as TCPOpenV6
-//                val messageTypeBytes = ByteArray(1)
-//                messageTypeBytes[0] = this.messageType.byte.toByte()
-//                val endpointBytes = tcpOpenV6.endpointV6.getBytes()
-//                val streamIDBytes = longToByteArray(tcpOpenV6.streamIdentifier)
-//
-//                return messageTypeBytes + endpointBytes + streamIDBytes
-//            }
-//        }
-//    }
 }
 
-open class Content {}
-class TCPOpenV4(val endpointV4: EndpointV4, val streamIdentifier: StreamIdentifier): Content()
-class TCPOpenV6(val endpointV6: EndpointV6, val streamIdentifier: StreamIdentifier): Content()
-class TCPClose(val streamIdentifier: StreamIdentifier): Content()
-class TCPData(val streamIdentifier: StreamIdentifier, val payload: ByteArray): Content()
-class UDPDataV4(val endpointV4: EndpointV4, val payload: ByteArray): Content()
-class UDPDataV6(val endpointV6: EndpointV6, val payload: ByteArray): Content()
-class IPAssignV4(val inet4Address: Inet4Address): Content()
-class IPAssignV6(val inet6Address: Inet6Address): Content()
-class IPAssignDualStack(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content() {}
-class IPDataV4(val bytes: ByteArray): Content()
-class IPDataV6(val bytes: ByteArray): Content()
-class IPRequestV4: Content()
-class IPRequestV6: Content()
-class IPRequestDualStack: Content()
-class IPReuseV4(val inet4Address: Inet4Address): Content()
-class IPReuseV6(val inet6Address: Inet6Address): Content()
-class IPReuseDualStackType(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content()
-class ICMPDataV4Type(val inet4Address: Inet4Address, val bytes: ByteArray): Content()
-class ICMPDataV6Type(val inet6Address: Inet6Address, val bytes: ByteArray): Content()
+interface Content
+{
+    val data: ByteArray
+}
+
+class TCPOpenV4(val endpointV4: EndpointV4, val streamIdentifier: StreamIdentifier): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.TCPOpenV4Type.byte.toByte()
+
+        data = messageTypeBytes + endpointV4.getBytes() + longToByteArray(streamIdentifier)
+    }
+}
+
+class TCPOpenV6(val endpointV6: EndpointV6, val streamIdentifier: StreamIdentifier): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.TCPOpenV6Type.byte.toByte()
+
+        data = messageTypeBytes + endpointV6.getBytes() + longToByteArray(streamIdentifier)
+    }
+}
+
+class TCPClose(val streamIdentifier: StreamIdentifier): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.TCPCloseType.byte.toByte()
+
+        data = messageTypeBytes + longToByteArray(streamIdentifier)
+    }
+}
+
+class TCPData(val streamIdentifier: StreamIdentifier, val payload: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.TCPDataType.byte.toByte()
+
+        data = messageTypeBytes + longToByteArray(streamIdentifier) + payload
+    }
+}
+
+class UDPDataV4(val endpointV4: EndpointV4, val payload: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.UDPDataV4Type.byte.toByte()
+
+        data = messageTypeBytes + endpointV4.getBytes() + payload
+    }
+}
+
+class UDPDataV6(val endpointV6: EndpointV6, val payload: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.UDPDataV6Type.byte.toByte()
+
+        data = messageTypeBytes + endpointV6.getBytes() + payload
+    }
+}
+
+class IPAssignV4(val inet4Address: Inet4Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPAssignV4Type.byte.toByte()
+
+        data = messageTypeBytes + inet4Address.address
+    }
+}
+
+class IPAssignV6(val inet6Address: Inet6Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPAssignV6Type.byte.toByte()
+
+        data = messageTypeBytes + inet6Address.address
+    }
+}
+
+class IPAssignDualStack(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPAssignDualStackType.byte.toByte()
+
+        data = messageTypeBytes + inet4Address.address + inet6Address.address
+    }
+}
+
+class IPDataV4(val bytes: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPDataV4Type.byte.toByte()
+
+        data = messageTypeBytes + bytes
+    }
+}
+
+class IPDataV6(val bytes: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPDataV6Type.byte.toByte()
+
+        data = messageTypeBytes + bytes
+    }
+}
+
+class IPRequestV4: Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPRequestV4Type.byte.toByte()
+
+        data = messageTypeBytes
+    }
+}
+
+class IPRequestV6: Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPRequestV6Type.byte.toByte()
+
+        data = messageTypeBytes
+    }
+}
+
+class IPRequestDualStack: Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPRequestDualStackType.byte.toByte()
+
+        data = messageTypeBytes
+    }
+}
+
+class IPReuseV4(val inet4Address: Inet4Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPReuseV4Type.byte.toByte()
+
+        data = messageTypeBytes + inet4Address.address
+    }
+}
+
+class IPReuseV6(val inet6Address: Inet6Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPReuseV6Type.byte.toByte()
+
+        data = messageTypeBytes + inet6Address.address
+    }
+}
+
+class IPReuseDualStackType(val inet4Address: Inet4Address, val inet6Address: Inet6Address): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.IPReuseDualStackType.byte.toByte()
+
+        data = messageTypeBytes + inet4Address.address + inet6Address.address
+    }
+}
+
+class ICMPDataV4Type(val inet4Address: Inet4Address, val bytes: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.ICMPDataV4Type.byte.toByte()
+
+        data = messageTypeBytes + inet4Address.address + bytes
+    }
+}
+
+class ICMPDataV6Type(val inet6Address: Inet6Address, val bytes: ByteArray): Content
+{
+    override val data: ByteArray
+
+    init
+    {
+        val messageTypeBytes = ByteArray(1)
+        messageTypeBytes[0] = MessageType.ICMPDataV6Type.byte.toByte()
+
+        data = messageTypeBytes + inet6Address.address + bytes
+    }
+}
 
 enum class MessageType(val byte: Int)
 {
