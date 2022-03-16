@@ -26,17 +26,14 @@ class FlowerUnitTest
         val newPacketString = "45000021cbcb0000401100007f0000017f000001de1b04d2000dfe20746573740a"
         val pingPacket = hexStringToByteArray(newPacketString)
 
-        val host = "127.0.0.1"
+        val host = ""
         val port = 1234
-        val socketAddress = InetSocketAddress(host, port)
-        val socket = Socket()
-        socket.connect(socketAddress)
-        val transmissionConnection = TransmissionConnection(socket, null)
+        val transmissionConnection = TransmissionConnection(host, port, ConnectionType.TCP, null)
         val flowerConnection = FlowerConnection(transmissionConnection, null)
 
+        // IP Request
         val messageData = IPRequestV4().data
         val ipRequest = Message(messageData)
-
         flowerConnection.writeMessage(ipRequest)
 
         val ipAssign = flowerConnection.readMessage()
