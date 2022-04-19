@@ -46,15 +46,17 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
         {
             while (true)
             {
-                print("<----- readMessages() called!")
+                println("<----- readMessages() called!")
                 val maybeData = connection.readWithLengthPrefix(16)
 
                 if (maybeData == null)
                 {
+                    println("Flower failed to read data from the Transmission connection.")
                     logger?.log(Level.SEVERE, "Flower failed to read data from the Transmission connection.")
                     return@async
                 }
 
+                println("Flower read data: ${maybeData.decodeToString()}")
                 logger?.log(Level.FINE, "Flower read data: ${maybeData.decodeToString()}" )
 
                 val message = Message(maybeData!!)
@@ -66,13 +68,13 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     @Synchronized
     fun writeMessage(message: Message)
     {
-        print("Write queue is addeding a message: $message")
+        println("Write queue is addeding a message: $message")
         writeQueue.put(message)
     }
 
     fun writeMessages()
     {
-        print("-----> writeMessages() called!")
+        println("-----> writeMessages() called!")
         writeCoroutineScope.async(Dispatchers.IO)
         {
             print("-----> writeMessages() async happening!")
@@ -87,6 +89,7 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
                     if (messageSent == false)
                     {
+                        println("Flower failed to write a message.")
                         logger?.log(Level.SEVERE, "Flower failed to write a message.")
                         return@async
                     }
