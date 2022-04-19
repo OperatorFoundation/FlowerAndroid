@@ -35,16 +35,9 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     }
 
     @Synchronized
-    fun readMessage(): Message?
+    fun readMessage(): Message
     {
-        if (readQueue.isEmpty())
-        {
-            return null
-        }
-        else
-        {
-            return readQueue.remove()
-        }
+        return readQueue.take()
     }
 
     fun readMessages()
@@ -74,7 +67,7 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     fun writeMessage(message: Message)
     {
         print("Write queue is addeding a message: $message")
-        writeQueue.add(message)
+        writeQueue.put(message)
     }
 
     fun writeMessages()
