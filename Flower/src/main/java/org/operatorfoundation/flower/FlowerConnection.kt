@@ -3,14 +3,17 @@ package org.operatorfoundation.flower
 import kotlinx.coroutines.*
 import org.operatorfoundation.transmission.TransmissionConnection
 import java.util.*
+import java.util.concurrent.BlockingDeque
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
 
 class FlowerConnection(var connection: TransmissionConnection, val logger: Logger?)
 {
-    var readQueue:Queue<Message> = LinkedList()
-    var writeQueue: Queue<Message> = LinkedList()
+    var readQueue: BlockingQueue<Message> = LinkedBlockingQueue()
+    var writeQueue: BlockingQueue<Message> = LinkedBlockingQueue()
 
     private val parentJob = Job()
     private var readCouroutineScope = CoroutineScope(Dispatchers.Default + parentJob)
