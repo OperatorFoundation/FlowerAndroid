@@ -21,13 +21,13 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     init
     {
         println("FlowerConnection.init called.")
-        readCouroutineScope.launch {
-            readMessages()
-        }
-
 
         writeCoroutineScope.launch {
             writeMessages()
+        }
+
+        readCouroutineScope.launch {
+            readMessages()
         }
     }
 
