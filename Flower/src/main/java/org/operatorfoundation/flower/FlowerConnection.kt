@@ -2,13 +2,10 @@ package org.operatorfoundation.flower
 
 import kotlinx.coroutines.*
 import org.operatorfoundation.transmission.TransmissionConnection
-import java.util.*
-import java.util.concurrent.BlockingDeque
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.logging.Level
 import java.util.logging.Logger
-import kotlin.coroutines.CoroutineContext
 
 class FlowerConnection(var connection: TransmissionConnection, val logger: Logger?)
 {
@@ -95,12 +92,12 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
                     if (messageSent == false)
                     {
-                        println("Flower failed to write a message.")
-                        logger?.log(Level.SEVERE, "Flower failed to write a message.")
+                        println("FlowerConnection.writeMessages: failed to write a message.")
+                        logger?.log(Level.SEVERE, "FlowerConnection.writeMessages: failed to write a message.")
                         return@async
                     }
 
-                    println("FlowerConnection.writeMessages() sent a message to the transmission connection - ${message.description}")
+                    println("FlowerConnection.writeMessages: sent a message to the transmission connection - ${message.description}")
                 }
             }
         }
