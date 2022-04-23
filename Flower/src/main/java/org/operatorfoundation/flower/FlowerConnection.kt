@@ -15,9 +15,11 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     var readQueue: BlockingQueue<Message> = LinkedBlockingQueue()
     var writeQueue: BlockingQueue<Message> = LinkedBlockingQueue()
 
-    private val parentJob = Job()
-    private var readCouroutineScope = CoroutineScope(Dispatchers.Default + parentJob)
-    private var writeCoroutineScope = CoroutineScope(Dispatchers.Default + parentJob)
+    private val readParentJob = Job()
+    private var readCouroutineScope = CoroutineScope(Dispatchers.Default + readParentJob)
+
+    private val writeParentJob = Job()
+    private var writeCoroutineScope = CoroutineScope(Dispatchers.Default + writeParentJob)
 
     init
     {
@@ -45,7 +47,6 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
         {
             while (true)
             {
-
                 val maybeData = connection.readWithLengthPrefix(16)
 
                 if (maybeData == null)
@@ -70,21 +71,25 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     @Synchronized
     fun writeMessage(message: Message)
     {
-        println("FlowerConnection.writeMessage: adding a message to the queue: $message")
+        println("FlowerConnection.writeMessage: adding a message to the queue: ${message.description}")
         writeQueue.put(message)
     }
 
     fun writeMessages()
     {
-        println("FlowerConnection.writeMessages() called")
+        println("FlowerConnection.writeMessages() called. Starting loop...")
         writeCoroutineScope.async(Dispatchers.IO)
         {
             while (true)
             {
                 if (writeQueue.isNotEmpty())
                 {
+                    println("FlowerConnection.writeMessages: Found something in the queue.")
+
                     val message = writeQueue.remove()
                     val messageData = message.data
+
+                    println("FlowerConnection.writeMessages: removed a message from the queue - ${message.description}.")
 
                     val messageSent = connection.writeWithLengthPrefix(messageData, 16)
 
@@ -95,11 +100,10 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                         return@async
                     }
 
-                    println("FlowerConnection.writeMessages() removed a message from the queue and sent it to the transmission connection: $message")
+                    println("FlowerConnection.writeMessages() sent a message to the transmission connection - ${message.description}")
                 }
             }
         }
-
     }
 
 
