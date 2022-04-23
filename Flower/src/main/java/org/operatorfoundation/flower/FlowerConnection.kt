@@ -21,15 +21,13 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
     init
     {
-        print("@~>~~  Flower init called.")
+        println("FlowerConnection.init called.")
         readCouroutineScope.launch {
-            print("^^^^^^ Launching read coroutine")
             readMessages()
         }
 
 
         writeCoroutineScope.launch {
-            print("^^^^^ Launching write coroutine")
             writeMessages()
         }
     }
@@ -42,25 +40,29 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
     fun readMessages()
     {
+        println("FlowerConnection.readMessages() called. Starting loop...")
         readCouroutineScope.async(Dispatchers.IO)
         {
             while (true)
             {
-                println("<----- readMessages() called!")
+
                 val maybeData = connection.readWithLengthPrefix(16)
 
                 if (maybeData == null)
                 {
-                    println("Flower failed to read data from the Transmission connection.")
+                    println("FlowerConnection.readMessages: failed to read data from the Transmission connection.")
                     logger?.log(Level.SEVERE, "Flower failed to read data from the Transmission connection.")
                     return@async
                 }
+                else
+                {
+                    println("FlowerConnection.readMessages: read some data: ${maybeData.decodeToString()}")
+                    logger?.log(Level.FINE, "FlowerConnection.readMessages read some data: ${maybeData.decodeToString()}" )
 
-                println("Flower read data: ${maybeData.decodeToString()}")
-                logger?.log(Level.FINE, "Flower read data: ${maybeData.decodeToString()}" )
-
-                val message = Message(maybeData!!)
-                readQueue.add(message)
+                    val message = Message(maybeData)
+                    readQueue.add(message)
+                    println("FlowerConnection.readMessages: added a message to the queue - ${message.description}")
+                }
             }
         }
     }
@@ -68,16 +70,15 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     @Synchronized
     fun writeMessage(message: Message)
     {
-        println("Write queue is addeding a message: $message")
+        println("FlowerConnection.writeMessage: adding a message to the queue: $message")
         writeQueue.put(message)
     }
 
     fun writeMessages()
     {
-        println("-----> writeMessages() called!")
+        println("FlowerConnection.writeMessages() called")
         writeCoroutineScope.async(Dispatchers.IO)
         {
-            print("-----> writeMessages() async happening!")
             while (true)
             {
                 if (writeQueue.isNotEmpty())
@@ -93,6 +94,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                         logger?.log(Level.SEVERE, "Flower failed to write a message.")
                         return@async
                     }
+
+                    println("FlowerConnection.writeMessages() removed a message from the queue and sent it to the transmission connection: $message")
                 }
             }
         }
