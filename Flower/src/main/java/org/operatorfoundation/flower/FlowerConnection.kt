@@ -12,45 +12,47 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     var readQueue: BlockingQueue<Message> = LinkedBlockingQueue()
     var writeQueue: BlockingQueue<Message> = LinkedBlockingQueue()
 
-    private val readParentJob = Job()
-    private var readCouroutineScope = CoroutineScope(Dispatchers.Default + readParentJob)
-
-    private val writeParentJob = Job()
-    private var writeCoroutineScope = CoroutineScope(Dispatchers.Default + writeParentJob)
+    private var readCoroutineScope = CoroutineScope(Dispatchers.IO + Job())
+    private var writeCoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     init
     {
         println("FlowerConnection.init called.")
 
         writeCoroutineScope.launch {
-            writeMessages()
-        }
 
-        readCouroutineScope.launch {
-            readMessages()
+            coroutineScope {
+                launch { writeMessages() }
+                launch { readMessages() }
+
+            }
         }
     }
 
     @Synchronized
     fun readMessage(): Message
     {
+        println("FlowerConnection.readMessage() called")
         return readQueue.take()
     }
 
-    fun readMessages()
-    {
+    suspend fun readMessages() = coroutineScope {
         println("FlowerConnection.readMessages() called. Starting loop...")
-        readCouroutineScope.async(Dispatchers.IO)
-        {
+
+        launch {
             while (true)
             {
-                val maybeData = connection.readWithLengthPrefix(16)
+//                println("~")
+                val maybeData = withContext(coroutineContext) {
+                    println("FlowerConnection.readMessages: calling connection.readWithLengthPrefix")
+                    connection.readWithLengthPrefix(16)
+                }
 
                 if (maybeData == null)
                 {
                     println("FlowerConnection.readMessages: failed to read data from the Transmission connection.")
                     logger?.log(Level.SEVERE, "Flower failed to read data from the Transmission connection.")
-                    return@async
+                    return@launch
                 }
                 else
                 {
@@ -59,7 +61,7 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
                     val message = Message(maybeData)
                     readQueue.add(message)
-                    println("FlowerConnection.readMessages: added a message to the queue - ${message.description}")
+                    println("FlowerConnection.readMessages: added a message to the queue - ${message.messageType}")
                 }
             }
         }
@@ -68,17 +70,17 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
     @Synchronized
     fun writeMessage(message: Message)
     {
-        println("FlowerConnection.writeMessage: adding a message to the queue: ${message.description}")
+        println("FlowerConnection.writeMessage: adding a message to the queue: ${message.messageType}")
         writeQueue.put(message)
     }
 
-    fun writeMessages()
-    {
+    suspend fun writeMessages() = coroutineScope {
         println("FlowerConnection.writeMessages() called. Starting loop...")
-        writeCoroutineScope.async(Dispatchers.IO)
-        {
+
+        launch {
             while (true)
             {
+//                println("*")
                 if (writeQueue.isNotEmpty())
                 {
                     println("FlowerConnection.writeMessages: Found something in the queue.")
@@ -86,18 +88,24 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                     val message = writeQueue.remove()
                     val messageData = message.data
 
-                    println("FlowerConnection.writeMessages: removed a message from the queue - ${message.description}.")
+                    println("FlowerConnection.writeMessages: removed a message from the queue - ${message.messageType}.")
 
-                    val messageSent = connection.writeWithLengthPrefix(messageData, 16)
+                    val messageSent = withContext(coroutineContext){
+                        connection.writeWithLengthPrefix(messageData, 16)
+                    }
+
+                    println("FlowerConnection.writeMessages: sent a message to the transmission connection. Success - $messageSent")
 
                     if (messageSent == false)
                     {
                         println("FlowerConnection.writeMessages: failed to write a message.")
                         logger?.log(Level.SEVERE, "FlowerConnection.writeMessages: failed to write a message.")
-                        return@async
+                        return@launch
                     }
-
-                    println("FlowerConnection.writeMessages: sent a message to the transmission connection - ${message.description}")
+                    else
+                    {
+                        println("FlowerConnection.writeMessages: ${message.messageType} message sent")
+                    }
                 }
             }
         }

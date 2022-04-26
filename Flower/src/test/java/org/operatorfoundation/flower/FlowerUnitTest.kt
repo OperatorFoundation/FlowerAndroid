@@ -1,12 +1,10 @@
 package org.operatorfoundation.flower
 
+import org.junit.Assert.fail
 import org.junit.Test
-
-import org.junit.Assert.*
 import org.operatorfoundation.transmission.ConnectionType
 import org.operatorfoundation.transmission.TransmissionConnection
-import java.net.InetSocketAddress
-import java.net.Socket
+import java.net.InetAddress
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -16,21 +14,57 @@ import java.net.Socket
 class FlowerUnitTest
 {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun testFlowerMessages()
+    {
+        try
+        {
+            // FIXME: Valid server IP
+            val transmissionConnection = TransmissionConnection("", 1234, ConnectionType.TCP, null)
+            val flowerConnection = FlowerConnection(transmissionConnection, null)
+            val messageData = IPRequestV4().data
+            val ipRequest = Message(messageData)
+
+            println("\n🌙 is attempting to write a 🌻 message...")
+            flowerConnection.writeMessage(ipRequest)
+
+            println("\n🌙 is attempting to read a 🌻 message...")
+            val flowerResponse = flowerConnection.readMessage()
+
+            when(flowerResponse.messageType)
+            {
+                MessageType.IPAssignV4Type ->
+                {
+                    println("\n🌙 Got a 🌻 IPV4 Assignment!!")
+                    val messageContent = flowerResponse.content as IPAssignV4
+                    val inet4AddressData = messageContent.inet4Address.address
+
+                    val inetAddress = InetAddress.getByAddress(inet4AddressData)
+                    val ipv4AssignmentString = inetAddress.toString()
+
+                }
+                else ->
+                {
+                    println("🌙 Our first response from the server was not an ipv4 assignment.")
+                }
+            }
+        }
+        catch (error: Exception)
+        {
+            println("🌙 Error creating socket: " + error.message)
+        }
     }
 
     @Test
     fun testServerUDP()
     {
-        val newPacketString = "45000021cbcb0000401100007f0000017f000001de1b04d2000dfe20746573740a"
+        val newPacketString = "450000258ad100004011ef41c0a801e79fcb9e5adf5104d200115d4268656c6c6f6f6f6f0a"
         val pingPacket = hexStringToByteArray(newPacketString)
 
-        val host = ""
+        val host = "ServerIP"
         val port = 1234
         val transmissionConnection = TransmissionConnection(host, port, ConnectionType.TCP, null)
         val flowerConnection = FlowerConnection(transmissionConnection, null)
-
+        
         // IP Request
         val messageData = IPRequestV4().data
         val ipRequest = Message(messageData)
