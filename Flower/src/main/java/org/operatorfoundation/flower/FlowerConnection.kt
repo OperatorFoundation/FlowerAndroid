@@ -43,6 +43,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
            println("FlowerConnection.writeMessage(message: ${message.messageType}) called")
 
            val messageData = message.data
+           print("\"FlowerConnection.writeMessage: message size - ${messageData.count()}")
+           print("\"FlowerConnection.writeMessage: message hex - ${messageData.toHexString()}")
            val messageSent = connection.writeWithLengthPrefix(messageData, 16)
 
            println("FlowerConnection.writeMessage: sent a message to the transmission connection. Success - $messageSent")

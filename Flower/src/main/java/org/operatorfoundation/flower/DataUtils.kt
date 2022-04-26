@@ -1,7 +1,6 @@
 package org.operatorfoundation.flower
 
 import java.nio.ByteBuffer
-import java.util.*
 
 fun ByteArray.splitOn(position: Int): Pair<ByteArray, ByteArray>
 {
@@ -16,4 +15,9 @@ fun longToByteArray(value: Long): ByteArray
     val bytes = ByteArray(8)
     val byteBuffer = ByteBuffer.wrap(bytes).putLong(value)
     return byteBuffer.array()
+}
+
+fun ByteArray.toHexString() = asUByteArray().joinToString("")
+{
+    it.toString(16).padStart(2, '0')
 }
