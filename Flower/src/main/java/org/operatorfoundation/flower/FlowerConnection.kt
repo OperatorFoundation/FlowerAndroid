@@ -30,7 +30,7 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
         }
     }
 
-    @Synchronized
+    // @Synchronized
     fun writeMessage(message: Message)
     {
         println("FlowerConnection.writeMessage(message: ${message.messageType}) called")
