@@ -16,19 +16,19 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
             println("FlowerConnection.readMessage() called")
 
             val maybeData = connection.readWithLengthPrefix(16)
-            println("FlowerConnection.readMessages: returned from connection.readWithLengthPrefix")
+            println("FlowerConnection.readMessages: returned from connection.readWithLengthPrefix()")
 
             if (maybeData == null)
             {
-                println("FlowerConnection.readMessages: failed to read data from the Transmission connection.")
-                logger?.log(Level.SEVERE, "Flower failed to read data from the Transmission connection.")
+                println("FlowerConnection.readMessage: failed to read data from the Transmission connection.")
+                logger?.log(Level.SEVERE, "FlowerConnection.readMessage: failed to read data from the Transmission connection.")
                 return null
             }
             else {
-                println("FlowerConnection.readMessages: read some data: ${maybeData.decodeToString()}")
+                println("FlowerConnection.readMessage: read some data: ${maybeData.decodeToString()}")
                 logger?.log(
                     Level.FINE,
-                    "FlowerConnection.readMessages read some data: ${maybeData.decodeToString()}"
+                    "FlowerConnection.readMessage: read some data: ${maybeData.decodeToString()}"
                 )
 
                 return Message(maybeData)
@@ -38,7 +38,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
 
     fun writeMessage(message: Message)
     {
-       synchronized(writeLock) {
+       synchronized(writeLock)
+       {
            println("FlowerConnection.writeMessage(message: ${message.messageType}) called")
 
            val messageData = message.data
