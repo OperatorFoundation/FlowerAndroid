@@ -29,22 +29,26 @@ class FlowerUnitTest
 
             println("\n🌙 is attempting to read a 🌻 message...")
             val flowerResponse = flowerConnection.readMessage()
-
-            when(flowerResponse.messageType)
+            if (flowerResponse == null)
             {
-                MessageType.IPAssignV4Type ->
+                println("\uD83C\uDF19 The flower response was null.")
+            }
+            else
+            {
+                when(flowerResponse.messageType)
                 {
-                    println("\n🌙 Got a 🌻 IPV4 Assignment!!")
-                    val messageContent = flowerResponse.content as IPAssignV4
-                    val inet4AddressData = messageContent.inet4Address.address
-
-                    val inetAddress = InetAddress.getByAddress(inet4AddressData)
-                    val ipv4AssignmentString = inetAddress.toString()
-
-                }
-                else ->
-                {
-                    println("🌙 Our first response from the server was not an ipv4 assignment.")
+                    MessageType.IPAssignV4Type ->
+                    {
+                        println("\n🌙 Got a 🌻 IPV4 Assignment!!")
+                        val messageContent = flowerResponse.content as IPAssignV4
+                        val inet4AddressData = messageContent.inet4Address.address
+                        val inetAddress = InetAddress.getByAddress(inet4AddressData)
+                        val ipv4AssignmentString = inetAddress.toString()
+                    }
+                    else ->
+                    {
+                        println("🌙 Our first response from the server was not an ipv4 assignment.")
+                    }
                 }
             }
         }
