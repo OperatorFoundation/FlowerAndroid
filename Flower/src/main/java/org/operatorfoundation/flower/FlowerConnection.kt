@@ -24,7 +24,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                 logger?.log(Level.SEVERE, "FlowerConnection.readMessage: failed to read data from the Transmission connection.")
                 return null
             }
-            else {
+            else
+            {
                 println("FlowerConnection.readMessage: read some data: ${maybeData.decodeToString()}")
                 logger?.log(
                     Level.FINE,

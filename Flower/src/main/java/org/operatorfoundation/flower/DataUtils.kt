@@ -17,7 +17,6 @@ fun longToByteArray(value: Long): ByteArray
     return byteBuffer.array()
 }
 
-fun ByteArray.toHexString() = asUByteArray().joinToString("")
-{
+fun ByteArray.toHexString() = asUByteArray().joinToString("") {
     it.toString(16).padStart(2, '0')
 }
