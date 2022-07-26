@@ -4,10 +4,33 @@ import org.operatorfoundation.transmission.TransmissionConnection
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class FlowerConnection(var connection: TransmissionConnection, val logger: Logger?)
+class FlowerConnection(var connection: TransmissionConnection, val logger: Logger?, val readLogging: Boolean = false, val writeLogging: Boolean = false)
 {
     val readLock = Object()
     val writeLock = Object()
+
+    var readLog: ArrayList<ByteArray>?
+    var writeLog: ArrayList<ByteArray>?
+
+    init {
+        if (readLogging)
+        {
+            readLog = ArrayList<ByteArray>()
+        }
+        else
+        {
+            readLog = null
+        }
+
+        if (writeLogging)
+        {
+            writeLog = ArrayList<ByteArray>()
+        }
+        else
+        {
+            writeLog = null
+        }
+    }
 
     fun readMessage(): Message?
     {
@@ -32,6 +55,8 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                     "FlowerConnection.readMessage: read some data: ${maybeData.decodeToString()}"
                 )
 
+                readLog?.add(maybeData)
+
                 return Message(maybeData)
             }
         }
@@ -44,9 +69,12 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
            println("FlowerConnection.writeMessage(message: ${message.messageType}) called")
 
            val messageData = message.data
-           print("\"FlowerConnection.writeMessage: message size - ${messageData.count()}")
-           print("\"FlowerConnection.writeMessage: message hex - ${messageData.toHexString()}")
+           println("\"FlowerConnection.writeMessage: message size - ${messageData.count()}")
+           println("\"FlowerConnection.writeMessage: message hex - ${messageData.toHexString()}")
+
            val messageSent = connection.writeWithLengthPrefix(messageData, 16)
+
+           writeLog?.add(messageData)
 
            println("FlowerConnection.writeMessage: sent a message to the transmission connection. Success - $messageSent")
 
