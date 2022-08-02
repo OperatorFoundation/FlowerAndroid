@@ -91,7 +91,7 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
                println("Write log: ")
 
                writeLog?.forEach {
-                   println(it.toHexString())
+                   println("Data Length ${it.size}: ${it.toHexString()}")
                }
            }
        }
