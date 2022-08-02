@@ -87,6 +87,12 @@ class FlowerConnection(var connection: TransmissionConnection, val logger: Logge
            else
            {
                println("FlowerConnection.writeMessage: ${message.messageType} message sent")
+
+               println("Write log: ")
+
+               writeLog?.forEach {
+                   println(it.toHexString())
+               }
            }
        }
     }
