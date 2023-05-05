@@ -15,7 +15,7 @@ open class Message(val data: ByteArray)
     {
         val (messageTypeSlice, tail) = data.splitOn(1)
         require(messageTypeSlice.isNotEmpty())
-            {"Failed to create a message, we were unable to parse the message type."}
+            {"🌸🦨 Flower.Message: Failed to create a message, we were unable to parse the message type."}
 
         val messageTypeInt = messageTypeSlice.first().toInt()
         messageType = MessageType.from(messageTypeInt)
@@ -28,9 +28,9 @@ open class Message(val data: ByteArray)
                 val (destinationData, streamIDData) = tail.splitOn(endpointSize)
 
                 require(destinationData.isNotEmpty())
-                    {"Failed to create a TCPOpenV4 message, we were unable to parse the destination address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPOpenV4 message, we were unable to parse the destination address."}
                 require(streamIDData.isNotEmpty())
-                    {"Failed to create a TCPOpenV4 message, we were unable to parse the streamID."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPOpenV4 message, we were unable to parse the streamID."}
 
                 val endpointV4 = EndpointV4(destinationData)
                 val streamID = ByteBuffer.wrap(streamIDData).long
@@ -42,9 +42,9 @@ open class Message(val data: ByteArray)
                 val (destinationData, streamIDData) = tail.splitOn(endpointSize)
 
                 require(destinationData.isNotEmpty())
-                    {"Failed to create a TCPOpenV6 message, we were unable to parse the destination address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPOpenV6 message, we were unable to parse the destination address."}
                 require(streamIDData.isNotEmpty())
-                    {"Failed to create a TCPOpenV6 message, we were unable to parse the streamID."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPOpenV6 message, we were unable to parse the streamID."}
 
                 val endpointV6 = EndpointV6(destinationData)
                 val streamID = ByteBuffer.wrap(streamIDData).long
@@ -61,9 +61,9 @@ open class Message(val data: ByteArray)
                 val (streamIDData, payload) = tail.splitOn(endpointSize)
                 require(streamIDData.isNotEmpty())
 
-                    {"Failed to create a TCPData message, we were unable to parse the streamID."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPData message, we were unable to parse the streamID."}
                 require(payload.isNotEmpty())
-                    {"Failed to create a TCPData message, we were unable to parse the payload."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a TCPData message, we were unable to parse the payload."}
 
                 val streamID = ByteBuffer.wrap(streamIDData).long
                 content = TCPData(streamID, payload)
@@ -74,9 +74,9 @@ open class Message(val data: ByteArray)
                 val (destinationData, payload) = tail.splitOn(endpointSize)
 
                 require(destinationData.isNotEmpty())
-                    {"Failed to create a UDPDataV4 message, we were unable to parse the destination address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a UDPDataV4 message, we were unable to parse the destination address."}
                 require(payload.isNotEmpty())
-                    {"Failed to create a UDPDataV4 message, we were unable to parse the payload."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a UDPDataV4 message, we were unable to parse the payload."}
 
                 val endpointV4 = EndpointV4(destinationData)
                 content = UDPDataV4(endpointV4, payload)
@@ -87,9 +87,9 @@ open class Message(val data: ByteArray)
                 val (destinationData, payload) = tail.splitOn(endpointSize)
 
                 require(destinationData.isNotEmpty())
-                    {"Failed to create a UDPDataV6 message, we were unable to parse the destination address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a UDPDataV6 message, we were unable to parse the destination address."}
                 require(payload.isNotEmpty())
-                    {"Failed to create a UDPDataV6 message, we were unable to parse the payload."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a UDPDataV6 message, we were unable to parse the payload."}
 
                 val endpointV6 = EndpointV6(destinationData)
                 content = UDPDataV6(endpointV6, payload)
@@ -109,9 +109,9 @@ open class Message(val data: ByteArray)
                 val (ipv4Bytes, ipv6Bytes) = tail.splitOn(AddressSize.v4.size)
 
                 require(ipv4Bytes.isNotEmpty())
-                    {"Failed to create a IPAssignDualStack message, we were unable to parse the IPV4 address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a IPAssignDualStack message, we were unable to parse the IPV4 address."}
                 require(ipv6Bytes.isNotEmpty())
-                    {"Failed to create a IPAssignDualStack message, we were unable to parse the IPV6 address."}
+                    {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a IPAssignDualStack message, we were unable to parse the IPV6 address."}
 
                 val inet4Address = Inet4Address.getByAddress(ipv4Bytes) as Inet4Address
                 val inet6Address = Inet6Address.getByAddress(ipv6Bytes) as Inet6Address
@@ -165,9 +165,9 @@ open class Message(val data: ByteArray)
                 val (ipv4Bytes, payload) = tail.splitOn(AddressSize.v4.size)
 
                 require(ipv4Bytes.isNotEmpty())
-                {"Failed to create a ICMPDataV4Type message, we were unable to parse the IPV4 address"}
+                {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a ICMPDataV4Type message, we were unable to parse the IPV4 address"}
                 require(payload.isNotEmpty())
-                {"Failed to create a ICMPDataV4Type message, we were unable to parse the payload"}
+                {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a ICMPDataV4Type message, we were unable to parse the payload"}
 
                 val inet4Address = Inet4Address.getByAddress(ipv4Bytes) as Inet4Address
                 content = ICMPDataV4Type(inet4Address, payload)
@@ -177,9 +177,9 @@ open class Message(val data: ByteArray)
                 val (ipv6Bytes, payload) = tail.splitOn(AddressSize.v6.size)
 
                 require(ipv6Bytes.isNotEmpty())
-                {"Failed to create a ICMPDataV6Type message, we were unable to parse the IPV6 address"}
+                {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a ICMPDataV6Type message, we were unable to parse the IPV6 address"}
                 require(payload.isNotEmpty())
-                {"Failed to create a ICMPDataV6Type message, we were unable to parse the payload"}
+                {"\uD83C\uDF38\uD83E\uDDA8 Flower.Message: Failed to create a ICMPDataV6Type message, we were unable to parse the payload"}
 
                 val inet6Address = Inet6Address.getByAddress(ipv6Bytes) as Inet6Address
                 content = ICMPDataV6Type(inet6Address, payload)
